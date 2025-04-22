@@ -1,0 +1,9 @@
+
+#nano
+*.swp
+
+#emacs
+\#*
+
+#idk
+*~
