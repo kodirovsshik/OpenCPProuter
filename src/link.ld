@@ -6,7 +6,7 @@ ENTRY(kernel_entry)
 
 SECTIONS
 {
-	.multiboot (INFO) :
+	.multiboot 0 (INFO) :
 	{
 		*(.multiboot)
 	}
@@ -19,7 +19,7 @@ SECTIONS
 		KEEP (*(SORT_NONE(.init)))
 	}
 
-	.text :
+	.text : AT(0x1000)
 	{
 		*(.text*)
 	}
@@ -108,6 +108,6 @@ SECTIONS
 	.debug_sup      0 : { *(.debug_sup) }
 	.gnu.attributes 0 : { KEEP (*(.gnu.attributes)) }
 
-	/DISCARD/ : { *(.note.GNU-stack) *(.gnu_debuglink) *(.gnu.lto_*) }
+	/DISCARD/ : { *(.note.GNU-stack) *(.gnu_debuglink) *(.gnu.lto_*) *(.note.gnu.build-id) *(.comment) }
 	
 }

@@ -14,7 +14,7 @@ struct alignas(8) multiboot_header
 		u16 type = 4;
 		u16 flags = 0;
 		u32 size = sizeof(multiboot_tag_flags);
-		u32 console_flags = 1;
+		u32 console_flags = 0;
 	} tag_flags;
 
 	struct alignas(8) multiboot_tag_relocatable
