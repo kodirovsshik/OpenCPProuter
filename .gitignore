@@ -7,3 +7,15 @@
 
 #idk
 *~
+
+#temp dirs
+build/
+iso/
+
+#build intermediates
+*.o
+*.d
+
+#build results
+*.elf
+*.iso
