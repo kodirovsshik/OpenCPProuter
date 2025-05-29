@@ -1,0 +1,15 @@
+
+# Editors temporary files
+*.swp
+\#*
+*~
+
+# Build temporary files
+*.o
+*.d
+
+# Build results
+*.efi
+*.elf
+*.bin
+*.iso
