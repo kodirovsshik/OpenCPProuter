@@ -1,7 +1,17 @@
 
-override ARCH_LIST := $(shell find kernel/arch/* -maxdepth 0 -type d ! -name "none" -printf "%f\n")
+#Guards against overwriting ARCH in case it is defined as an environment variable
+ifeq "$(ARCH)" ""
+#Customization point: "make ARCH=arch_name" to speciy kernel architecture. When ARCH is ommited, a complete list of supported architectures is printed
+ARCH := help
+endif
 
-ARCH := none
+override ARCHDIR := kernel/arch/$(ARCH)
 
-include kernel/arch/$(ARCH)/Makefile.inc
+override KERNEL_ARCH_ELF := $(ARCHDIR)/kernel_arch.elf
+override KERNEL_ARCH_CPP_SRC := $(call find_files,$(ARCHDIR),cpp)
+override KERNEL_ARCH_CPP_OBJ := $(KERNEL_ARCH_CPP_SRC:.cpp=.cpp.o)
 
+include $(ARCHDIR)/Makefile.inc
+
+$(KERNEL_ARCH_ELF): $(KENREL_ARCH_CPP_OBJ) $(KERNEL_ARCH_OTHER_OBJ)
+	$(debugprint)
