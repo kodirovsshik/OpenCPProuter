@@ -10,4 +10,3 @@ override KERNEL_ELF := $(ARCHDIR)/kernel.elf
 kernel: $(KERNEL_ELF)
 
 $(KERNEL_ELF): $(KERNEL_COMMON_ELF) $(KERNEL_ARCH_ELF)
-	$(debugprint)
