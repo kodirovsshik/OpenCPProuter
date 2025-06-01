@@ -12,8 +12,9 @@ override ARCHDIR := kernel/arch/$(ARCH)
 
 override KERNEL_ARCH_ELF := $(ARCHDIR)/kernel_arch.elf
 override KERNEL_ARCH_CPP_SRC := $(call find_files,$(ARCHDIR),cpp)
-override KERNEL_ARCH_CPP_OBJ := $(KERNEL_ARCH_CPP_SRC:.cpp=.cpp.o)
+override KERNEL_ARCH_CPP_OBJ := $(KERNEL_ARCH_CPP_SRC:.cpp=.cpp.obj)
 
 include $(ARCHDIR)/Makefile.inc
 
 $(KERNEL_ARCH_ELF): $(KERNEL_ARCH_CPP_OBJ) $(KERNEL_ARCH_OTHER_OBJ)
+	$(KERNEL_CXX) $^ -o $@ -r
