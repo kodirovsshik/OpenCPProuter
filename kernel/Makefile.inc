@@ -2,6 +2,11 @@
 override BAREMETAL_ARGS_COMPILE := -ffreestanding -nostdlibinc -nostdinc++
 override BAREMETAL_ARGS_LINK := -nodefaultlibs -nostartfiles -static -fuse-ld=lld
 
+override ARCH_VARS_FILE := kernel/arch/$(ARCH)/global_vars.Makefile.inc
+ifneq ($(wildcard $(ARCH_VARS_FILE)),)
+include $(ARCH_VARS_FILE)
+endif
+
 # Customization point: "make KERNEL_CXX=clang-21" to override C++ compiler used for kernel
 KERNEL_CXX := clang++
 # Customization point: "make KERNEL_CXX_ARGS='--target=my_baremetal_target'" to specify arguments for a custom C++ compiler for kernel

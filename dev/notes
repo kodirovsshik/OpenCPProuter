@@ -1,0 +1,6 @@
+
+compile: -fpie -fno-plt
+link: -static-pie
+^ apparently produces ASLR-ready code without the need for dynamic loader ?
+TODO: figure out ASLR
+

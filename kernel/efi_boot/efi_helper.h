@@ -1,5 +1,6 @@
 
 #include <efi.h>
+#undef __attribute__ //fuck gnu-efi
 
 #define efistr(x) (unsigned short*)(L ## x)
 #define println(x) ST->ConOut->OutputString(ST->ConOut, efistr(x L"\r\n"))
@@ -21,3 +22,28 @@
         EFI_STATUS Status = (x);                    \
         if (EFI_ERROR(Status)) stop(msg, Status);   \
     }
+
+struct EFI_MEMORY_TYPE_CUSTOM
+{
+	enum
+	{
+		EfiReservedMemoryType,
+		EfiLoaderCode,
+		EfiLoaderData,
+		EfiBootServicesCode,
+		EfiBootServicesData,
+		EfiRuntimeServicesCode,
+		EfiRuntimeServicesData,
+		EfiConventionalMemory,
+		EfiUnusableMemory,
+		EfiACPIReclaimMemory,
+		EfiACPIMemoryNVS,
+		EfiMemoryMappedIO,
+		EfiMemoryMappedIOPortSpace,
+		EfiPalCode,
+		EfiPersistentMemory,
+		EfiUnacceptedMemoryType,
+		EfiMaxMemoryType
+	};
+};
+

@@ -1,0 +1,2 @@
+
+override BAREMETAL_ARGS_COMPILE := $(BAREMETAL_ARGS_COMPILE) -mno-red-zone

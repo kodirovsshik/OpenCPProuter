@@ -5,8 +5,11 @@
 *~
 
 # Build temporary files
-*.o
+*.obj
 *.d
+
+# Testing temporary files
+ESP/
 
 # Build results
 *.efi
