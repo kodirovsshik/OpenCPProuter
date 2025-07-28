@@ -10,4 +10,4 @@ NASM_ARGS :=
 $(ARCHDIR)/%.asm.obj: $(ARCHDIR)/%.asm
 	"$(NASM)" $(NASM_ARGS) -Wall -Werror -f elf64 $^ -o $@
 
-override ARCH_LINK_ARGS := -T $(ARCHDIR)/link.ld
+override ARCH_ARGS_LINK := -T $(ARCHDIR)/link.ld
