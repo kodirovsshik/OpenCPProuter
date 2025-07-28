@@ -3,10 +3,10 @@ BITS 64
 global kernel_entry
 
 extern main_thread_stack_top
-	
+extern kernel_early_init
 
 
-section .entry_text
+section .entry_point
 
 kernel_entry:
 	cli
@@ -19,7 +19,9 @@ kernel_entry:
 	mov rdi, rbx
 	call serial_puts
 
-	jmp hlt
+	mov rdi, rbx
+	jmp kernel_early_init
+
 .data:
 	db "OpenCPProuter kernel!", 0
 

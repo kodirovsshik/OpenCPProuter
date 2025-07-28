@@ -2,7 +2,7 @@
 # Customization point: "make EFI_CXX=x86_64-efi-g++" to override C++ compiler for EFI applications
 EFI_CXX := clang++
 # Customization point: "make 'EFI_CXX_ARGS=...'" to override arguments for C++ compiler for EFI applications
-EFI_CXX_ARGS := --target=x86_64-unknown-windows-efi -I/usr/include/efi \
+EFI_CXX_ARGS := --target=x86_64-unknown-windows-efi -I/usr/include/efi -mno-red-zone \
 -fuse-ld=lld-link -nostdlib -Wl,-entry:efi_main -Wl,-subsystem:efi_application -Wl,-largeaddressaware -mgeneral-regs-only 
 
 override EFI_CXX := "$(EFI_CXX)" $(WARN) $(BAREMETAL_ARGS_COMPILE) $(BAREMETAL_ARGS_LINK) $(EFI_CXX_ARGS) -std=c++26 -Wno-c23-extensions

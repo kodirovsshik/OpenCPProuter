@@ -1,11 +1,10 @@
 
 override BAREMETAL_ARGS_COMPILE := -ffreestanding -nostdlibinc -nostdinc++
-override BAREMETAL_ARGS_LINK := -nodefaultlibs -nostartfiles -static -fuse-ld=lld
+override BAREMETAL_ARGS_LINK := -nodefaultlibs -nostartfiles
 
-override ARCH_VARS_FILE := kernel/arch/$(ARCH)/global_vars.Makefile.inc
-ifneq ($(wildcard $(ARCH_VARS_FILE)),)
-include $(ARCH_VARS_FILE)
-endif
+override KERNEL_ARGS_COMPILE := $(BAREMETAL_ARGS_COMPILE) -fpie
+override KERNEL_ARGS_LINK := $(BAREMETAL_ARGS_LINK) -static-pie -fuse-ld=lld
+#TODO: a way for arch-specific makefile to introduce -mno-red-zone
 
 # Customization point: "make KERNEL_CXX=clang-21" to override C++ compiler used for kernel
 KERNEL_CXX := clang++
@@ -19,7 +18,7 @@ include kernel/src/Makefile.inc
 override KERNEL_ELF := $(ARCHDIR)/kernel.elf
 
 $(KERNEL_ELF): $(KERNEL_COMMON_ELF) $(KERNEL_ARCH_ELF)
-	$(KERNEL_CXX) $^ -o $@ $(BAREMETAL_ARGS_LINK) $(ARCH_LINK_ARGS) -Wl,--defsym=BUILD_TIMESTAMP=$(shell date +%s)
+	$(KERNEL_CXX) $^ -o $@ $(KERNEL_ARGS_LINK) $(ARCH_ARGS_LINK) -Wl,--defsym=BUILD_TIMESTAMP=$(shell date +%s)
 
 override ALL_DEPENDENCIES += kernel
 .PHONY: kernel

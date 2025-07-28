@@ -19,6 +19,7 @@ SECTIONS
 	. = ALIGN(PAGE_SIZE);
 	.entry :
 	{
+		*(.entry_point)
 		*(.entry_text)
 	}
 

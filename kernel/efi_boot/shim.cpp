@@ -46,9 +46,11 @@ struct kernel_data_t
 		uint8_t major = 1;
 		uint8_t minor = 0;
 	};
+	static_assert(sizeof(preamble_t) == 8);
 
 	preamble_t preamble;
 	memory_map_entry_t* memory_map;
+	EFI_RUNTIME_SERVICES* efi_runtime_services;
 	uint32_t memory_map_category_sizes[kernel_memory_map_categories_count];
 	
 } kernel_data{};
@@ -125,9 +127,12 @@ void fill_memory_map()
 int efi_main(EFI_HANDLE handle, EFI_SYSTEM_TABLE* system_table)
 {
 	ST = system_table;
+
 	println("OpenCPProuter loader");
 
 	fill_memory_map();
+
+	kernel_data.efi_runtime_services = ST->RuntimeServices;
 
 	ST->BootServices->ExitBootServices(handle, memory_map_key);
 	
