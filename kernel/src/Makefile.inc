@@ -7,7 +7,7 @@ override KERNEL_COMMON_CPP_SRC := $(call find_files,kernel/src,cpp)
 override KERNEL_COMMON_CPP_OBJ := $(KERNEL_COMMON_CPP_SRC:.cpp=.cpp.obj)
 
 $(KERNEL_COMMON_ELF): $(KERNEL_COMMON_CPP_OBJ)
-	$(KERNEL_CXX) $^ -o $@ -r
+	$(KERNEL_CXX_LINK_PARTIAL) $^ -o $@
 
 kernel/src/%.cpp.obj: kernel/src/%.cpp
-	$(KERNEL_CXX) $^ -o $@ -c $(BAREMETAL_ARGS_COMPILE)
+	$(KERNEL_CXX_COMPILE) $^ -o $@

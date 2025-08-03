@@ -92,20 +92,36 @@ SECTIONS
 
 
 
-	/* This section is to be used by the early init code
+	. = ALIGN(8);
+	.note.build-date :
+	{
+		*(.note.build-date)
+	}
+	. = ALIGN(8);
+	.note.build-time :
+	{
+		*(.note.build-time)
+	}
+
+
+
+	/* This area is to be used by the early init code
 	   as a temporaty stack for the init thread */
 
 	. = ALIGN(PAGE_SIZE);
 	. += PAGE_SIZE;
 	/* ^^^ This page intentionally left blank */	
-	.stack :
-	{
-		PROVIDE_HIDDEN(main_thread_stack_bottom = .);
-		. = . + PAGE_SIZE;
-		PROVIDE_HIDDEN(main_thread_stack_top = .);
-	}
+	PROVIDE_HIDDEN(main_thread_stack_bottom = .);
+	. = . + PAGE_SIZE;
+	PROVIDE_HIDDEN(main_thread_stack_top = .);
 
 
 
+	/* today I learned that symbol and string tables
+	   are actually sections themselves */
+	
 	.comment 0 : { *(.comment) }
+	.shstrtab 0 : { *(.shstrtab) }
+	.symtab 0 : { *(.symtab) }
+	.strtab 0 : { *(.strtab) }
 }

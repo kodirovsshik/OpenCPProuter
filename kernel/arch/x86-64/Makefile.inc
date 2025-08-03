@@ -7,7 +7,10 @@ NASM := nasm
 # Customization point: "make NASM_ARGS='...'" to append custom args to nasm
 NASM_ARGS :=
 
-$(ARCHDIR)/%.asm.obj: $(ARCHDIR)/%.asm
-	"$(NASM)" $(NASM_ARGS) -Wall -Werror -f elf64 $^ -o $@
+override NASM := "$(NASM)" -Wall -Werror $(NASM_ARGS) -f elf64
+OBJCOPY := objcopy
+# ^^^ TODO: make it a customization point
 
-override ARCH_ARGS_LINK := -T $(ARCHDIR)/link.ld
+$(ARCHDIR)/%.asm.obj: $(ARCHDIR)/%.asm
+	$(NASM) $^ -o $@
+	$(OBJCOPY) --add-section ".note.GNU-stack=/dev/null" --set-section-flags ".note.GNU-stack=contents,readonly" $@

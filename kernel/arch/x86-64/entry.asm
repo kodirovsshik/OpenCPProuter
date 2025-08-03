@@ -20,6 +20,7 @@ kernel_entry:
 	call serial_puts
 
 	mov rdi, rbx
+	hlt
 	jmp kernel_early_init
 
 .data:
