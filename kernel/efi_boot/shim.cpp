@@ -1,5 +1,8 @@
 
 #include "efi_helper.h"
+#include <ocppr/init.hpp>
+
+using namespace init;
 
 #define stringify1(x) #x
 #define stringify(x) stringify1(x)
@@ -11,13 +14,15 @@ alignas(4096) const unsigned char KERNEL_PAYLOAD[] =
 #embed stringify(KERNEL_BIN)
 };
 
+kernel_args_t kernel_args{};
+UINTN memory_map_key = 0;
+EFI_SYSTEM_TABLE* ST = nullptr;
 
-static constexpr UINT32 kernel_memory_map_category_flags[] =
+static constexpr UINT32 kernel_memory_map_category_flags[kernel_args_t::memory_map_categories::count] =
 {
-	//invalid category
-	0,
+	[kernel_args_t::memory_map_categories::reserved] = 0,
 
-	//useable after bootloader trasnfers control to kernel
+	[kernel_args_t::memory_map_categories::available] =
 	(1 << EfiConventionalMemory) |
 	(1 << EFI_MEMORY_TYPE_CUSTOM::EfiPersistentMemory) | //Apparently this one is absent in my gnu-efi package
 	(1 << EfiLoaderCode) |
@@ -25,40 +30,12 @@ static constexpr UINT32 kernel_memory_map_category_flags[] =
 	(1 << EfiBootServicesCode) |
 	(1 << EfiBootServicesData),
 
-	//useable after ACPI tables are parsed
+	[kernel_args_t::memory_map_categories::acpi_reclaimable] =
 	(1 << EfiACPIReclaimMemory),
 };
 
 static constexpr uint32_t kernel_memory_map_categories_count = countof(kernel_memory_map_category_flags);
-
-
-struct kernel_data_t
-{
-	struct memory_map_entry_t
-	{
-		uint64_t begin;
-		uint64_t pages;
-	};
-
-	struct preamble_t
-	{
-		struct { char value[6] = "OCPPR"; } str;
-		uint8_t major = 1;
-		uint8_t minor = 0;
-	};
-	static_assert(sizeof(preamble_t) == 8);
-
-	preamble_t preamble;
-	memory_map_entry_t* memory_map;
-	EFI_RUNTIME_SERVICES* efi_runtime_services;
-	uint32_t memory_map_category_sizes[kernel_memory_map_categories_count];
-	
-} kernel_data{};
-
-
-
-UINTN memory_map_key = 0;
-EFI_SYSTEM_TABLE* ST = nullptr;
+static_assert(kernel_memory_map_categories_count >= kernel_args_t::memory_map_categories::count);
 
 
 
@@ -99,7 +76,7 @@ void fill_memory_map()
 	const UINTN max_entries_total = bytes_total / bytes_per_item + 4;
 	
 	efi_table = alloc<UINT8>(bytes_total);
-	auto* kernel_table = alloc<kernel_data_t::memory_map_entry_t>(max_entries_total);
+	auto* kernel_table = alloc<kernel_args_t::memory_map_entry_t>(max_entries_total);
 
 	try_get_memory_map(); //TODO: check for success
 
@@ -118,10 +95,10 @@ void fill_memory_map()
 				++kernel_table_index;
 			}
 		}
-		kernel_data.memory_map_category_sizes[category] = kernel_table_index - kernel_table_index_begin;
+		kernel_args.memory_map_category_sizes[category] = kernel_table_index - kernel_table_index_begin;
 	}
 
-	kernel_data.memory_map = kernel_table;
+	kernel_args.memory_map = kernel_table;
 }
 
 int efi_main(EFI_HANDLE handle, EFI_SYSTEM_TABLE* system_table)
@@ -132,12 +109,13 @@ int efi_main(EFI_HANDLE handle, EFI_SYSTEM_TABLE* system_table)
 
 	fill_memory_map();
 
-	kernel_data.efi_runtime_services = ST->RuntimeServices;
+	kernel_args.base_phy_addr = (uptr)&KERNEL_PAYLOAD;
+	kernel_args.efi_runtime_services = (uptr)ST->RuntimeServices;
 
 	ST->BootServices->ExitBootServices(handle, memory_map_key);
 	
-	using kernel_entry_func_t = void (__attribute__((sysv_abi))*)(kernel_data_t*);
-	((kernel_entry_func_t)&KERNEL_PAYLOAD)(&kernel_data);
+	using kernel_entry_func_t = void (__attribute__((sysv_abi))*)(kernel_args_t*);
+	((kernel_entry_func_t)&KERNEL_PAYLOAD)(&kernel_args);
 
 	return -1;
 }

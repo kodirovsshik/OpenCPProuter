@@ -26,7 +26,7 @@ KERNEL_CXX_ARGS_LINK :=
 # Customization point: "make KERNEL_CXX_ARGS_PARTIAL_LINK='...'" to specify C++ compiler args for kernel (partial linking only)
 KERNEL_CXX_ARGS_PARTIAL_LINK :=
 
-override _KERNEL_CXX_ARGS_COMPILE := -fPIE
+override _KERNEL_CXX_ARGS_COMPILE := -fpie -fdirect-access-external-data -fno-exceptions -fno-rtti -std=c++26 -Ikernel/include
 override _KERNEL_CXX_ARGS_LINK := -Wl,--orphan-handling=error -Wl,--fatal-warnings -fuse-ld=lld
 # ^^^ TODO: come up with a proper names for these
 

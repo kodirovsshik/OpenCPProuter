@@ -1,37 +1,59 @@
 BITS 64
 	
 global kernel_entry
+global serial_puts
 
-extern main_thread_stack_top
-extern kernel_early_init
+%define kernel_remap _ZN4init12kernel_remapERKNS_13kernel_args_tE
+	
+extern _main_thread_stack_top
+extern kernel_remap
 
 
-section .entry_point
+section .init_entry
 
 kernel_entry:
 	cli
-	lea rsp, [rel main_thread_stack_top]
-	mov rbx, rdi
+	xor rax, rax
+	
+	lea rsp, [rel _main_thread_stack_top]
+	mov rbp, eax
 
-	lea rdi, [rel .data]
-	call serial_puts
-
-	mov rdi, rbx
-	call serial_puts
-
-	mov rdi, rbx
-	hlt
-	jmp kernel_early_init
+	times 2 push rax
+	jmp kernel_remap
 
 .data:
-	db "OpenCPProuter kernel!", 0
+	db "OpenCPProuter kernel", 0
 
 
 
 
 
+section .data:
+gdt_data:
+.null:
+	dq 0
+.code64_kernel:
+	dw 0xFFFF
+	dw 0
+	db 0
+	db 0b10011000
+	db 0b10101111
+	db 0
+.data64_kernel:
+	dw 0xFFFF
+	dw 0
+	db 0
+	db 0b10010010
+	db 0b10101111
+	db 0
+.cpu_descriptor:
+	dd gdt_data - $$
+	dw .cpu_descriptor - gdt_data
 
-;;; rdi = string
+
+section .text
+
+; rdi = string
 serial_puts:
 	mov dx, 0x3F8
 	cld

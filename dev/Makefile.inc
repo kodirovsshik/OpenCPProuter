@@ -6,7 +6,7 @@ ESP:
 	mkdir -p ESP/EFI/BOOT
 
 .PHONY: ESP-update
-ESP-update: $(KERNEL_EFI) | ESP
+ESP-update: kernel_efi | ESP
 	cp $(KERNEL_EFI) ESP/EFI/BOOT/BOOTX64.efi
 
 .PNONY: run
