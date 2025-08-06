@@ -18,4 +18,6 @@ using iptr = intptr_t;
 using uptr = uintptr_t;
 
 static_assert(sizeof(size_t) == sizeof(uptr));
-using ssize_t = iptr;
+using isize = iptr;
+using usize = uptr;
+using ptrdiff = isize;

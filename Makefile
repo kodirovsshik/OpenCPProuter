@@ -20,5 +20,5 @@ all-with-known-dependencies: $(ALL_DEPENDENCIES)
 
 .PHONY: clean
 clean:
-	find . $(eregex) "(.*\/)?(~.+|.+~|#.+#|.*\.(obj|o|d|elf|efi|bin|iso))" -exec rm {} \;
+	find . $(eregex) "(.*\/)?(~.+|.+~|\.#.+|#.+#|.*\.(obj|o|d|elf|efi|bin|iso))" -exec rm {} \;
 	rm -rf ESP 

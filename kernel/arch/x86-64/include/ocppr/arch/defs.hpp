@@ -1,0 +1,3 @@
+
+#define PAGE_SHIFT 12
+#define KERNEL_LOAD_RANDOM_BITS 20

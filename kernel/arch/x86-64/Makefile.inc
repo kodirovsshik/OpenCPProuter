@@ -12,5 +12,5 @@ OBJCOPY := objcopy
 # ^^^ TODO: make it a customization point
 
 $(ARCHDIR)/%.asm.obj: $(ARCHDIR)/%.asm
-	$(NASM) $^ -o $@
+	$(NASM) $^ -o $@ -g
 	$(OBJCOPY) --add-section ".note.GNU-stack=/dev/null" --set-section-flags ".note.GNU-stack=contents,readonly" $@

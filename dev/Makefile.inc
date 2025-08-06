@@ -15,7 +15,8 @@ run: ESP-update
 
 .PHONY: debug
 debug: ESP-update
-	$(QEMU_EFI_X86_64) -s -S >qemu_out.log 2>qemu_err.log &
+	$(QEMU_EFI_x86_64) -s -S >qemu_out.log 2>qemu_err.log &
+	gdb -x dev/gdb_script
 # TODO: insert debugger invocation here
 
 include dev/Makefile2.inc
