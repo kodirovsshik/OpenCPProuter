@@ -1,28 +1,36 @@
 BITS 64
 	
+global halt
 global kernel_entry
 global serial_puts
 global init_get_entropy16
 global init_switch_to_virtual_addresses	
 
-%define kernel_remap _ZN4init12kernel_remapERKNS_13kernel_args_tE
+%define kernel_init _ZN4init11kernel_initERKNS_13kernel_args_tE
 	
 extern _main_thread_stack_top
-extern kernel_remap
+extern kernel_init
 
 
 section .init_entry
 
 kernel_entry:
+;;; push rdi
+;;; int3
+.post_int3:
+;;; pop rdi
 	cli
 	cld
+
+	call print_kernel_base
+
 	xor rax, rax
 	
 	lea rsp, [rel _main_thread_stack_top]
 	mov rbp, rax
 
 	times 2 push rax
-	jmp kernel_remap
+	jmp kernel_init
 
 .data:
 	db "OpenCPProuter kernel", 0
@@ -33,7 +41,40 @@ kernel_entry:
 	
 section .init
 
-	
+
+print_kernel_base:
+	lea rax, [rel kernel_entry]
+.loop1_start:
+	mov ecx, 16
+.loop1:
+	mov edx, eax
+	and dl, 15
+	cmp dl, 10
+	jae .loop1_add_hex
+.loop1_add_decimal:
+	add dl, '0'
+	jmp .loop1_tail
+.loop1_add_hex:
+	add dl, 'A' - 10
+.loop1_tail:
+	push dx
+	shr rax, 4
+	loop .loop1
+.loop2_start:
+	mov ecx, 16
+	mov dx, 0x3F8
+.loop2:
+	pop ax
+	out dx, al
+	loop .loop2
+.ret:
+	mov al, `\n`
+	out dx, al
+	mov al, `\r`
+	out dx, al
+	ret
+
+
 init_switch_to_virtual_addresses:
 	pop rax
 	add rax, rdi
@@ -124,7 +165,7 @@ serial_puts:
 
 
 
-hlt:	
+halt:	
 	cli
 	mov al, 0x80
 	out 0x70, al

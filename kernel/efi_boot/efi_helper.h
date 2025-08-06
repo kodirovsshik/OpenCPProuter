@@ -2,8 +2,12 @@
 #include <efi.h>
 #undef __attribute__ //fuck gnu-efi
 
-#define efistr(x) (unsigned short*)(L ## x)
-#define println(x) ST->ConOut->OutputString(ST->ConOut, efistr(x L"\r\n"))
+#define efistr(x) (wchar_t*)(L ## x)
+#define println(x)												\
+	{															\
+		ST->ConOut->OutputString(ST->ConOut, efistr(x));		\
+		ST->ConOut->OutputString(ST->ConOut, efistr("\r\n"));	\
+	}
 #define wait_kb()                                                       \
     {                                                                   \
         EFI_INPUT_KEY Key;                                              \

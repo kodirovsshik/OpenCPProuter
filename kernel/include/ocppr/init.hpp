@@ -12,11 +12,17 @@ namespace init
 				//invalid category
 				reserved = 0,
 
-				//useable after bootloader's data is no longer needed
+				//useable at all times after control transferred to kernel
 				available,
+
+				//useable after init is done, includes kernel image and data
+				bootloader,
 
 				//useable after ACPI tables are parsed
 				acpi_reclaimable,
+
+				//anything reported as not useable by firmware
+				unuseable,
 
 				count
 			};
@@ -32,10 +38,9 @@ namespace init
 		u8 major = 1;
 		u8 minor = 0;
 
-		memory_map_entry_t* memory_map;
-		uptr base_phy_addr;
-		uptr efi_runtime_services;
-		u32 memory_map_category_sizes[memory_map_categories::count];
+		uptr efi_runtime_services = nullptr;
+		memory_map_entry_t* memory_map = nullptr;
+		u32 memory_map_category_sizes[memory_map_categories::count]{};
 	
 	};
 }

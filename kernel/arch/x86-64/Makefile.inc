@@ -7,7 +7,7 @@ NASM := nasm
 # Customization point: "make NASM_ARGS='...'" to append custom args to nasm
 NASM_ARGS :=
 
-override NASM := "$(NASM)" -Wall -Werror $(NASM_ARGS) -f elf64
+override NASM := "$(NASM)" -Wall -Werror -Wno-reloc-rel $(NASM_ARGS) -f elf64 -g
 OBJCOPY := objcopy
 # ^^^ TODO: make it a customization point
 

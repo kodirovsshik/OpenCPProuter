@@ -20,18 +20,32 @@ EFI_SYSTEM_TABLE* ST = nullptr;
 
 static constexpr UINT32 kernel_memory_map_category_flags[kernel_args_t::memory_map_categories::count] =
 {
+	//Reserved category, not a "reserved memory type"
 	[kernel_args_t::memory_map_categories::reserved] = 0,
 
 	[kernel_args_t::memory_map_categories::available] =
 	(1 << EfiConventionalMemory) |
-	(1 << EFI_MEMORY_TYPE_CUSTOM::EfiPersistentMemory) | //Apparently this one is absent in my gnu-efi package
 	(1 << EfiLoaderCode) |
-	(1 << EfiLoaderData) |
 	(1 << EfiBootServicesCode) |
 	(1 << EfiBootServicesData),
 
+	[kernel_args_t::memory_map_categories::bootloader] = 
+	(1 << EfiLoaderData),
+
 	[kernel_args_t::memory_map_categories::acpi_reclaimable] =
 	(1 << EfiACPIReclaimMemory),
+
+	[kernel_args_t::memory_map_categories::unuseable] =
+	(1 << EfiReservedMemoryType) |
+	(1 << EfiRuntimeServicesCode) |
+	(1 << EfiRuntimeServicesData) |
+	(1 << EfiUnuseableMemory) |
+	(1 << EfiACPIMemoryNVS) |
+	(1 << EfiPalCode) |
+	(1 << EfiPersistentmemory) |
+	(1 << EfiUnacceptedMemoryType) |
+	(1 << EfiMemoryMappedIO) |
+	(1 << EfiMemoryMappedIOPortSpace),
 };
 
 static constexpr uint32_t kernel_memory_map_categories_count = countof(kernel_memory_map_category_flags);
@@ -109,7 +123,6 @@ int efi_main(EFI_HANDLE handle, EFI_SYSTEM_TABLE* system_table)
 
 	fill_memory_map();
 
-	kernel_args.base_phy_addr = (uptr)&KERNEL_PAYLOAD;
 	kernel_args.efi_runtime_services = (uptr)ST->RuntimeServices;
 
 	ST->BootServices->ExitBootServices(handle, memory_map_key);

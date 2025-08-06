@@ -1,0 +1,5 @@
+#gnu-efi
+#nasm
+#make
+
+#clang built with headers for x86_64-unknown-none-elf target

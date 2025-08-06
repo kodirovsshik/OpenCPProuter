@@ -1,6 +1,6 @@
 # Development QoL things
 
-override QEMU_EFI_x86_64 := qemu-system-x86_64 -bios /usr/share/ovmf/OVMF.fd -drive if=virtio,format=raw,file=fat:rw:./ESP
+override QEMU_EFI_x86_64 := qemu-system-x86_64 -bios $(shell dev/find_ovmf.sh) -drive if=virtio,format=raw,file=fat:rw:./ESP
 
 ESP:
 	mkdir -p ESP/EFI/BOOT

@@ -1,1 +1,13 @@
 target remote :1234
+set disassembly-flavor intel
+layout split
+focus cmd
+display/x {$rax,$rbx,$rcx,$rdx,$rsi,$rdi,$rsp,$rbp}
+display/x {*(long*)$rsp, *(long*)($rsp + 8), *(long*)($rsp + 16), *(long*)($rsp + 24)}
+
+set $kernel_init = 0x60A5000
+set $kernel_text = $kernel_init + 0x1000
+add-symbol-file kernel/arch/x86-64/kernel.elf -s .init $kernel_init -s .text $kernel_text
+br kernel_entry.post_int3
+c
+br kernel_init

@@ -15,6 +15,7 @@ DEFINE_SEGMENT(rwdata)
 
 extern "C" void init_get_entropy16(u8*);
 extern "C" void init_switch_to_virtual_addresses(ptrdiff);
+extern "C" const u8 kernel_entry;
 
 void mmap_addr(uptr, uptr, usize, u8)
 {
@@ -23,21 +24,55 @@ void mmap_addr(uptr, uptr, usize, u8)
 
 namespace init
 {
-	SECTION(.init) uptr kernel_space_begin();
-	
 	SECTION(.init) u64 rand_offset()
 	{
 		u8 entropy[16];
 		init_get_entropy16(entropy);
-		constexpr u64 rng_mask = ((u64)1 << KERNEL_LOAD_RANDOM_BITS) - 1;
+
+		constexpr u64 rng_mask = ((u64)1 << (KERNEL_LOAD_RANDOM_BITS)) - 1;
+
 		const u64 hash = fnv1a_64(entropy, sizeof(entropy)) & rng_mask; //TODO: use top bits instead?
 		return hash << PAGE_SHIFT;
 	}
-	
-	SECTION(.init) void kernel_remap(const kernel_args_t& args)
+
+	SECTION(.init) void validate_loader_data(const kernel_args& args)
 	{
-		const uptr phys_base_addr = args.base_phy_addr;
-		const uptr virt_base_addr = kernel_space_begin() + rand_offset();
+		if (memcmp(args.preamble.value, "OCPPR", 6) != 0)
+		{
+			debuglog("kernel data invalig signature");
+			halt();
+		}
+		
+	}
+
+	SECTION(.init) void num_puts(u64 x, const u8 base, u8 width = 1, const u8 pad_char = '0')
+	{
+		char buf[256];
+		char* p = buf + sizeof(buf);
+		*--p = 0;
+		while (x)
+		{
+			*--p = x % base;
+			x /= base;
+			if (width) --width;
+		}
+		while (width)
+			*--p = pad_char;
+		serial_puts(p);
+	}
+	
+	SECTION(.init) void kernel_init(const kernel_args_t& args)
+	{
+		serial_puts("OpenCPProuter!\r\n");
+		serial_puts("loaded at 0x");
+		num_puts(kernel_space_begin(), 16, 16);
+		serial_puts("\r\n");
+		
+		validate_loader_data(args);
+
+		(void)args;
+		const uptr phys_base_addr = (uptr)&kernel_entry;
+		const uptr virt_base_addr = KERNEL_SPACE_BEGIN + rand_offset();
 
 		auto map_segment = [&]
 		(uptr addr, usize sz, u8 flags)
@@ -53,6 +88,6 @@ namespace init
 
 		init_switch_to_virtual_addresses(virt_base_addr - phys_base_addr);
 
-		asm volatile ("hlt");
+		halt();
 	}
 }

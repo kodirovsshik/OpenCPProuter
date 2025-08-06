@@ -1,0 +1,2 @@
+Fontconfig warning: using without calling FcInit()
+qemu: terminating on signal 2
