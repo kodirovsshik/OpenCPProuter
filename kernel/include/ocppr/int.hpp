@@ -1,4 +1,7 @@
 
+#ifndef _OCPPR_INT_HPP_
+#define _OCPPR_INT_HPP_
+
 #ifndef _GNU_EFI
 #include <stdint.h>
 #include <stddef.h>
@@ -21,3 +24,5 @@ static_assert(sizeof(size_t) == sizeof(uptr));
 using isize = iptr;
 using usize = uptr;
 using ptrdiff = isize;
+
+#endif

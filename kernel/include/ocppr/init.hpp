@@ -38,7 +38,7 @@ namespace init
 		u8 major = 1;
 		u8 minor = 0;
 
-		uptr efi_runtime_services = nullptr;
+		uptr efi_runtime_services = 0;
 		memory_map_entry_t* memory_map = nullptr;
 		u32 memory_map_category_sizes[memory_map_categories::count]{};
 	

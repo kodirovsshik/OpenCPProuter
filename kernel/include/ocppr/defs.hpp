@@ -1,5 +1,9 @@
 
+#ifndef _OCPPR_DEFS_HPP_
+#define _OCPPR_DEFS_HPP_
+
 #include <ocppr/int.hpp>
+#include <ocppr/arch/defs.hpp>
 
 struct byte;
 
@@ -9,3 +13,5 @@ struct byte;
 #define LD_SYMBOL_ABSOLUTE(s) extern "C" byte _##s; static uptr s(){ return (uptr)&_##s - (uptr)&_kernel_space_begin; }
 
 LD_SYMBOL(kernel_space_begin)
+
+#endif

@@ -1,8 +1,9 @@
 
 #include <ocppr/init.hpp>
 #include <ocppr/defs.hpp>
-#include <ocppr/arch/defs.hpp>
 #include <ocppr/hash.hpp>
+#include <ocppr/memfunc.hpp>
+#include <ocppr/log.hpp>
 
 #define DEFINE_SEGMENT(s) LD_SYMBOL(s##_segment_begin) LD_SYMBOL_ABSOLUTE(s##_segment_size)
 
@@ -11,16 +12,14 @@ DEFINE_SEGMENT(executeable)
 DEFINE_SEGMENT(rodata)
 DEFINE_SEGMENT(rwdata)
 
-
+#define debuglog serial_puts
+void halt();
 
 extern "C" void init_get_entropy16(u8*);
 extern "C" void init_switch_to_virtual_addresses(ptrdiff);
 extern "C" const u8 kernel_entry;
 
-void mmap_addr(uptr, uptr, usize, u8)
-{
-	
-}
+void mmap_addr(uptr, uptr, usize, u8);
 
 namespace init
 {
@@ -35,7 +34,7 @@ namespace init
 		return hash << PAGE_SHIFT;
 	}
 
-	SECTION(.init) void validate_loader_data(const kernel_args& args)
+	SECTION(.init) void validate_loader_data(const kernel_args_t& args)
 	{
 		if (memcmp(args.preamble.value, "OCPPR", 6) != 0)
 		{
@@ -47,17 +46,16 @@ namespace init
 
 	SECTION(.init) void num_puts(u64 x, const u8 base, u8 width = 1, const u8 pad_char = '0')
 	{
-		char buf[256];
+		char buf[72];
 		char* p = buf + sizeof(buf);
-		*--p = 0;
 		while (x)
 		{
 			*--p = x % base;
 			x /= base;
 			if (width) --width;
 		}
-		while (width)
-			*--p = pad_char;
+		while (width --> 0)
+			outb(pad_char, 0x3F8);
 		serial_puts(p);
 	}
 	
